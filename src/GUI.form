@@ -156,20 +156,6 @@
               <toolTipText value="Delete Selected Employee"/>
             </properties>
           </component>
-          <component id="64b3b" class="javax.swing.JLabel" binding="outputLabel">
-            <constraints>
-              <grid row="1" column="0" row-span="3" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <background color="-1"/>
-              <font name="Calibri" size="20" style="0"/>
-              <foreground color="-16777216"/>
-              <horizontalAlignment value="0"/>
-              <horizontalTextPosition value="11"/>
-              <text value="Label"/>
-              <verticalTextPosition value="0"/>
-            </properties>
-          </component>
           <component id="87869" class="javax.swing.JButton" binding="showAllButton">
             <constraints>
               <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -180,6 +166,14 @@
               <text value=""/>
               <toolTipText value="Show All Empolyees"/>
             </properties>
+          </component>
+          <component id="bcc97" class="javax.swing.JTextArea" binding="outputTextArea">
+            <constraints>
+              <grid row="1" column="0" row-span="3" col-span="1" vsize-policy="2" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="50"/>
+              </grid>
+            </constraints>
+            <properties/>
           </component>
         </children>
       </grid>

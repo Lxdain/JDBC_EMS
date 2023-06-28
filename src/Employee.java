@@ -3,10 +3,9 @@ public class Employee {
     private String name;
     private int age;
     private String address;
-    private float salary;
+    private double salary;
 
-    // Constructor
-    public Employee(int id, String name, int age, String address, float salary) {
+    public Employee(int id, String name, int age, String address, double salary) {
         this.id = id;
         this.name = name;
         this.age = age;
@@ -14,7 +13,6 @@ public class Employee {
         this.salary = salary;
     }
 
-    // Getters
     public int getId() {
         return id;
     }
@@ -23,40 +21,20 @@ public class Employee {
         return name;
     }
 
-    public int getAge() { return age; }
+    public int getAge() {
+        return age;
+    }
 
     public String getAddress() {
         return address;
     }
 
-    public float getSalary() {
+    public double getSalary() {
         return salary;
-    }
-
-    // Setters
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public void setSalary(float salary) {
-        this.salary = salary;
     }
 
     @Override
     public String toString() {
-        return "Employee Details:" +
-                "\nID: " + id +
-                "\nName: " + name +
-                "\nAge: " + age +
-                "\nAddress: " + address +
-                "\nSalary: " + salary;
+        return "ID: " + id + ", Name: " + name + ", Age: " + age + ", Address: " + address + ", Salary: " + salary;
     }
 }
