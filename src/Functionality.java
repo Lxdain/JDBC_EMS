@@ -123,11 +123,11 @@ public class Functionality {
         List<Employee> employees = new ArrayList<>();
         while (resultSet.next()) {
             int id = resultSet.getInt("id");
-            String employeeName = resultSet.getString("name");
-            int employeeAge = resultSet.getInt("age");
-            String employeeAddress = resultSet.getString("address");
-            double employeeSalary = resultSet.getDouble("salary");
-            Employee employee = new Employee(id, employeeName, employeeAge, employeeAddress, employeeSalary);
+            String name = resultSet.getString("name");
+            int age = resultSet.getInt("age");
+            String address = resultSet.getString("address");
+            double salary = resultSet.getDouble("salary");
+            Employee employee = new Employee(id, name, age, address, salary);
             employees.add(employee);
         }
         resultSet.close();

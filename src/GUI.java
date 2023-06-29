@@ -22,8 +22,7 @@ public class GUI extends JFrame {
     private JLabel addressLabel;
     private JLabel salaryLabel;
     private JPanel accountPanel;
-    private JScrollPane outputScrollPane;
-    private JTextArea outputTextArea;
+    private JLabel outputLabel;
     private JButton showAllButton;
     private Functionality functionality;
 
@@ -48,10 +47,10 @@ public class GUI extends JFrame {
                 Employee employee = new Employee(functionality.getNextEmployeeId(), name, age, address, salary);
                 try {
                     functionality.addEmployee(employee);
-                    outputTextArea.append("Employee added successfully!\n");
+                    outputLabel.setText("Employee added successfully!");
                     clearFields();
                 } catch (SQLException ex) {
-                    outputTextArea.append("Failed to add employee. Error: " + ex.getMessage() + "\n");
+                    outputLabel.setText("Failed to add employee. Error: " + ex.getMessage());
                 }
             }
         });
@@ -67,10 +66,10 @@ public class GUI extends JFrame {
                 Employee employee = new Employee(id, name, age, address, salary);
                 try {
                     functionality.editEmployee(employee);
-                    outputTextArea.append("Employee updated successfully!\n");
+                    outputLabel.setText("Employee updated successfully!");
                     clearFields();
                 } catch (SQLException ex) {
-                    outputTextArea.append("Failed to update employee. Error: " + ex.getMessage() + "\n");
+                    outputLabel.setText("Failed to update employee. Error: " + ex.getMessage());
                 }
             }
         });
@@ -81,10 +80,10 @@ public class GUI extends JFrame {
                 int id = Integer.parseInt(searchField.getText());
                 try {
                     functionality.deleteEmployee(id);
-                    outputTextArea.append("Employee deleted successfully!\n");
+                    outputLabel.setText("Employee deleted successfully!");
                     clearFields();
                 } catch (SQLException ex) {
-                    outputTextArea.append("Failed to delete employee. Error: " + ex.getMessage() + "\n");
+                    outputLabel.setText("Failed to delete employee. Error: " + ex.getMessage());
                 }
             }
         });
@@ -97,7 +96,7 @@ public class GUI extends JFrame {
                     List<Employee> employees = functionality.searchEmployees(searchCriteria);
                     displayEmployees(employees);
                 } catch (SQLException ex) {
-                    outputTextArea.append("Failed to search employees. Error: " + ex.getMessage() + "\n");
+                    outputLabel.setText("Failed to search employees. Error: " + ex.getMessage());
                 }
             }
         });
@@ -109,20 +108,27 @@ public class GUI extends JFrame {
                     List<Employee> employees = functionality.retrieveEmployees();
                     displayEmployees(employees);
                 } catch (SQLException ex) {
-                    outputTextArea.append("Failed to retrieve employees. Error: " + ex.getMessage() + "\n");
+                    outputLabel.setText("Failed to retrieve employees. Error: " + ex.getMessage());
                 }
             }
         });
     }
 
     private void displayEmployees(List<Employee> employees) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html>");
+        StringBuilder sb = new StringBuilder("<html>");
+
         for (Employee employee : employees) {
-            sb.append("<p>").append(employee.toString()).append("</p>");
+            sb.append("<p>");
+            sb.append("ID: ").append(employee.getId()).append("<br>");
+            sb.append("Name: ").append(employee.getName()).append("<br>");
+            sb.append("Age: ").append(employee.getAge()).append("<br>");
+            sb.append("Salary: ").append(employee.getSalary()).append("<br>");
+            sb.append("</p>");
+            sb.append("<br>"); // Add an extra line break after each employee
         }
+
         sb.append("</html>");
-        outputTextArea.setText(sb.toString());
+        outputLabel.setText(sb.toString());
     }
 
     private void clearFields() {
