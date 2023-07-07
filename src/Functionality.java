@@ -36,9 +36,25 @@ public class Functionality {
             }
             resultSet.close();
             statement.close();
+
+            // Check if ID already exists in the database
+            while (isEmployeeIdExists(nextEmployeeId)) {
+                nextEmployeeId++; // Increment ID until unique
+            }
         } catch (SQLException e) {
             System.out.println("Error occurred while retrieving the next employee ID: " + e.getMessage());
         }
+    }
+
+    private boolean isEmployeeIdExists(int id) throws SQLException {
+        String query = "SELECT id FROM employees WHERE id = ?";
+        PreparedStatement statement = conn.prepareStatement(query);
+        statement.setInt(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        boolean exists = resultSet.next();
+        resultSet.close();
+        statement.close();
+        return exists;
     }
 
     public int getNextEmployeeId() {
@@ -46,14 +62,22 @@ public class Functionality {
     }
 
     public void addEmployee(Employee employee) throws SQLException {
-        String query = "INSERT INTO employees (id, name, age, address, salary) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement statement = conn.prepareStatement(query);
-        statement.setInt(1, employee.getId());
-        statement.setString(2, employee.getName());
-        statement.setInt(3, employee.getAge());
-        statement.setString(4, employee.getAddress());
-        statement.setDouble(5, employee.getSalary());
+        String query = "INSERT INTO employees (name, age, address, salary) VALUES (?, ?, ?, ?)";
+        PreparedStatement statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        statement.setString(1, employee.getName());
+        statement.setInt(2, employee.getAge());
+        statement.setString(3, employee.getAddress());
+        statement.setDouble(4, employee.getSalary());
         statement.executeUpdate();
+
+        // Retrieve ID from database
+        ResultSet generatedKeys = statement.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            int generatedId = generatedKeys.getInt(1);
+            employee.setId(generatedId);
+            nextEmployeeId = generatedId + 1;
+        }
+
         statement.close();
     }
 
@@ -133,5 +157,41 @@ public class Functionality {
         resultSet.close();
         statement.close();
         return employees;
+    }
+
+    public Employee getEmployeeById(int id) throws SQLException {
+        String query = "SELECT * FROM employees WHERE id = ?";
+        PreparedStatement statement = conn.prepareStatement(query);
+        statement.setInt(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        Employee employee = null;
+        if (resultSet.next()) {
+            String name = resultSet.getString("name");
+            int age = resultSet.getInt("age");
+            String address = resultSet.getString("address");
+            double salary = resultSet.getDouble("salary");
+            employee = new Employee(id, name, age, address, salary);
+        }
+        resultSet.close();
+        statement.close();
+        return employee;
+    }
+
+    public Employee getEmployeeByName(String name) throws SQLException {
+        String query = "SELECT * FROM employees WHERE name = ?";
+        PreparedStatement statement = conn.prepareStatement(query);
+        statement.setString(1, name);
+        ResultSet resultSet = statement.executeQuery();
+        Employee employee = null;
+        if (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            int age = resultSet.getInt("age");
+            String address = resultSet.getString("address");
+            double salary = resultSet.getDouble("salary");
+            employee = new Employee(id, name, age, address, salary);
+        }
+        resultSet.close();
+        statement.close();
+        return employee;
     }
 }

@@ -22,14 +22,17 @@ public class GUI extends JFrame {
     private JLabel addressLabel;
     private JLabel salaryLabel;
     private JPanel accountPanel;
-    private JLabel outputLabel;
+    private JComboBox<String> outputComboBox;
     private JButton showAllButton;
+    private JButton saveButton;
+    private JLabel outputLabel;
     private Functionality functionality;
+    private Employee selectedEmployee; // Store selected employee
 
     public GUI() {
         setTitle("Employee Management System");
         setContentPane(accountPanel);
-        setMinimumSize(new Dimension(1024, 768));
+        setMinimumSize(new Dimension(800, 600));
         setLocationRelativeTo(null);
         setVisible(true);
         setResizable(true);
@@ -47,10 +50,10 @@ public class GUI extends JFrame {
                 Employee employee = new Employee(functionality.getNextEmployeeId(), name, age, address, salary);
                 try {
                     functionality.addEmployee(employee);
-                    outputLabel.setText("Employee added successfully!");
+                    outputComboBox.addItem(employee.getName()); // Add employee name to JComboBox
                     clearFields();
                 } catch (SQLException ex) {
-                    outputLabel.setText("Failed to add employee. Error: " + ex.getMessage());
+                    outputComboBox.addItem("Failed to add employee. Error: " + ex.getMessage()); // Add error message to JComboBox (needs to be corrected so that it displays in the outputLabel)
                 }
             }
         });
@@ -58,18 +61,21 @@ public class GUI extends JFrame {
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int id = Integer.parseInt(searchField.getText());
-                String name = nameField.getText();
-                int age = Integer.parseInt(ageField.getText());
-                String address = addressField.getText();
-                double salary = Double.parseDouble(salaryField.getText());
-                Employee employee = new Employee(id, name, age, address, salary);
-                try {
-                    functionality.editEmployee(employee);
-                    outputLabel.setText("Employee updated successfully!");
-                    clearFields();
-                } catch (SQLException ex) {
-                    outputLabel.setText("Failed to update employee. Error: " + ex.getMessage());
+                if (selectedEmployee != null) {
+                    String name = nameField.getText();
+                    int age = Integer.parseInt(ageField.getText());
+                    String address = addressField.getText();
+                    double salary = Double.parseDouble(salaryField.getText());
+                    Employee updatedEmployee = new Employee(selectedEmployee.getId(), name, age, address, salary);
+                    try {
+                        functionality.editEmployee(updatedEmployee);
+                        outputLabel.setText("Employee edited successfully!");
+                        outputComboBox.removeItem(selectedEmployee.getName()); // Remove old employee name from JComboBox
+                        outputComboBox.addItem(updatedEmployee.getName()); // Add updated employee name to JComboBox
+                        clearFields();
+                    } catch (SQLException ex) {
+                        outputLabel.setText("Failed to update employee. Error: " + ex.getMessage());
+                    }
                 }
             }
         });
@@ -77,13 +83,14 @@ public class GUI extends JFrame {
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int id = Integer.parseInt(searchField.getText());
-                try {
-                    functionality.deleteEmployee(id);
-                    outputLabel.setText("Employee deleted successfully!");
-                    clearFields();
-                } catch (SQLException ex) {
-                    outputLabel.setText("Failed to delete employee. Error: " + ex.getMessage());
+                if (selectedEmployee != null) {
+                    try {
+                        functionality.deleteEmployee(selectedEmployee.getId());
+                        outputComboBox.removeItem(selectedEmployee.getName()); // Remove employee from JComboBox
+                        clearFields();
+                    } catch (SQLException ex) {
+                        outputComboBox.addItem("Failed to delete employee. Error: " + ex.getMessage()); // Add error message to JComboBox (needs to be corrected so that it displays in the outputLabel)
+                    }
                 }
             }
         });
@@ -95,8 +102,9 @@ public class GUI extends JFrame {
                 try {
                     List<Employee> employees = functionality.searchEmployees(searchCriteria);
                     displayEmployees(employees);
+                    clearFields();
                 } catch (SQLException ex) {
-                    outputLabel.setText("Failed to search employees. Error: " + ex.getMessage());
+                    outputComboBox.addItem("Failed to search employees. Error: " + ex.getMessage()); // Add error message to JComboBox (needs to be corrected so that it displays in the outputLabel)
                 }
             }
         });
@@ -107,28 +115,58 @@ public class GUI extends JFrame {
                 try {
                     List<Employee> employees = functionality.retrieveEmployees();
                     displayEmployees(employees);
+                    clearFields();
                 } catch (SQLException ex) {
-                    outputLabel.setText("Failed to retrieve employees. Error: " + ex.getMessage());
+                    outputComboBox.addItem("Failed to retrieve employees. Error: " + ex.getMessage()); // Add error message to JComboBox (needs to be corrected so that it displays in the outputLabel)
+                }
+            }
+        });
+
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (selectedEmployee != null) {
+                    String name = nameField.getText();
+                    int age = Integer.parseInt(ageField.getText());
+                    String address = addressField.getText();
+                    double salary = Double.parseDouble(salaryField.getText());
+                    Employee updatedEmployee = new Employee(selectedEmployee.getId(), name, age, address, salary);
+                    try {
+                        functionality.editEmployee(updatedEmployee);
+                        outputComboBox.addItem("Employee updated successfully!"); // Add success message to JComboBox (wrong, needs fixing)
+                        clearFields();
+                    } catch (SQLException ex) {
+                        outputComboBox.addItem("Failed to update employee. Error: " + ex.getMessage()); // Add error message to JComboBox
+                    }
+                }
+            }
+        });
+
+        outputComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedEmployeeName = (String) outputComboBox.getSelectedItem();
+                if (selectedEmployeeName != null) {
+                    try {
+                        Employee employee = functionality.getEmployeeByName(selectedEmployeeName);
+                        if (employee != null) {
+                            selectedEmployee = employee;
+                            setEmployeeFields(employee); // Prepopulate fields with selected employee information
+                            displayEmployeeInfo(employee);
+                        }
+                    } catch (SQLException ex) {
+                        outputLabel.setText("Failed to retrieve employee. Error: " + ex.getMessage());
+                    }
                 }
             }
         });
     }
 
     private void displayEmployees(List<Employee> employees) {
-        StringBuilder sb = new StringBuilder("<html>");
-
+        outputComboBox.removeAllItems(); // Clear previous items
         for (Employee employee : employees) {
-            sb.append("<p>");
-            sb.append("ID: ").append(employee.getId()).append("<br>");
-            sb.append("Name: ").append(employee.getName()).append("<br>");
-            sb.append("Age: ").append(employee.getAge()).append("<br>");
-            sb.append("Salary: ").append(employee.getSalary()).append("<br>");
-            sb.append("</p>");
-            sb.append("<br>"); // Add an extra line break after each employee
+            outputComboBox.addItem(employee.getName()); // Add employee name to JComboBox
         }
-
-        sb.append("</html>");
-        outputLabel.setText(sb.toString());
     }
 
     private void clearFields() {
@@ -137,6 +175,23 @@ public class GUI extends JFrame {
         addressField.setText("");
         salaryField.setText("");
         searchField.setText("");
+        selectedEmployee = null;
+    }
+
+    private void setEmployeeFields(Employee employee) {
+        nameField.setText(employee.getName());
+        ageField.setText(String.valueOf(employee.getAge()));
+        addressField.setText(employee.getAddress());
+        salaryField.setText(String.valueOf(employee.getSalary()));
+    }
+
+    private void displayEmployeeInfo(Employee employee) {
+        String info = "<html><b>ID:</b> " + employee.getId() + "<br>"
+                + "<b>Name:</b> " + employee.getName() + "<br>"
+                + "<b>Age:</b> " + employee.getAge() + "<br>"
+                + "<b>Address:</b> " + employee.getAddress() + "<br>"
+                + "<b>Salary:</b> " + employee.getSalary() + "</html>";
+        outputLabel.setText(info);
     }
 
     public static void main(String[] args) {
