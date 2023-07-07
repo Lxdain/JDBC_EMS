@@ -12,7 +12,6 @@ public class GUI extends JFrame {
     private JTextField salaryField;
     private JButton searchButton;
     private JButton addButton;
-    private JButton editButton;
     private JButton deleteButton;
     private JTextField searchField;
     private JLabel headerIcon;
@@ -44,38 +43,26 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String name = nameField.getText();
-                int age = Integer.parseInt(ageField.getText());
+                String ageText = ageField.getText();
                 String address = addressField.getText();
-                double salary = Double.parseDouble(salaryField.getText());
+                String salaryText = salaryField.getText();
+
+                if (!isValidNumber(ageText) || !isValidNumber(salaryText)) {
+                    outputLabel.setText("Invalid input type. These fields only accept numeric parameters.");
+                    clearOutputLabelAfterDelay(3000);
+                    return;
+                }
+
+                int age = Integer.parseInt(ageText);
+                double salary = Double.parseDouble(salaryText);
+
                 Employee employee = new Employee(functionality.getNextEmployeeId(), name, age, address, salary);
                 try {
                     functionality.addEmployee(employee);
                     outputComboBox.addItem(employee.getName()); // Add employee name to JComboBox
                     clearFields();
                 } catch (SQLException ex) {
-                    outputComboBox.addItem("Failed to add employee. Error: " + ex.getMessage()); // Add error message to JComboBox (needs to be corrected so that it displays in the outputLabel)
-                }
-            }
-        });
-
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (selectedEmployee != null) {
-                    String name = nameField.getText();
-                    int age = Integer.parseInt(ageField.getText());
-                    String address = addressField.getText();
-                    double salary = Double.parseDouble(salaryField.getText());
-                    Employee updatedEmployee = new Employee(selectedEmployee.getId(), name, age, address, salary);
-                    try {
-                        functionality.editEmployee(updatedEmployee);
-                        outputLabel.setText("Employee edited successfully!");
-                        outputComboBox.removeItem(selectedEmployee.getName()); // Remove old employee name from JComboBox
-                        outputComboBox.addItem(updatedEmployee.getName()); // Add updated employee name to JComboBox
-                        clearFields();
-                    } catch (SQLException ex) {
-                        outputLabel.setText("Failed to update employee. Error: " + ex.getMessage());
-                    }
+                    outputLabel.setText("Failed to add employee. Error: " + ex.getMessage());
                 }
             }
         });
@@ -88,8 +75,19 @@ public class GUI extends JFrame {
                         functionality.deleteEmployee(selectedEmployee.getId());
                         outputComboBox.removeItem(selectedEmployee.getName()); // Remove employee from JComboBox
                         clearFields();
+                        outputLabel.setText("Employee Successfully Deleted!");
+
+                        // Delayed clearing of outputLabel after 3 seconds
+                        Timer timer = new Timer(3000, new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                outputLabel.setText("");
+                            }
+                        });
+                        timer.setRepeats(false);
+                        timer.start();
                     } catch (SQLException ex) {
-                        outputComboBox.addItem("Failed to delete employee. Error: " + ex.getMessage()); // Add error message to JComboBox (needs to be corrected so that it displays in the outputLabel)
+                        outputLabel.setText("Failed to delete employee. Error: " + ex.getMessage()); // Update outputLabel with the error message
                     }
                 }
             }
@@ -104,7 +102,7 @@ public class GUI extends JFrame {
                     displayEmployees(employees);
                     clearFields();
                 } catch (SQLException ex) {
-                    outputComboBox.addItem("Failed to search employees. Error: " + ex.getMessage()); // Add error message to JComboBox (needs to be corrected so that it displays in the outputLabel)
+                    outputLabel.setText("Failed to search employees. Error: " + ex.getMessage()); // Update outputLabel with the error message
                 }
             }
         });
@@ -117,7 +115,7 @@ public class GUI extends JFrame {
                     displayEmployees(employees);
                     clearFields();
                 } catch (SQLException ex) {
-                    outputComboBox.addItem("Failed to retrieve employees. Error: " + ex.getMessage()); // Add error message to JComboBox (needs to be corrected so that it displays in the outputLabel)
+                    outputLabel.setText("Failed to retrieve employees. Error: " + ex.getMessage()); // Update outputLabel with the error message
                 }
             }
         });
@@ -127,16 +125,26 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (selectedEmployee != null) {
                     String name = nameField.getText();
-                    int age = Integer.parseInt(ageField.getText());
+                    String ageText = ageField.getText();
                     String address = addressField.getText();
-                    double salary = Double.parseDouble(salaryField.getText());
+                    String salaryText = salaryField.getText();
+
+                    if (!isValidNumber(ageText) || !isValidNumber(salaryText)) {
+                        outputLabel.setText("Invalid input type. These fields only accept numeric parameters.");
+                        clearOutputLabelAfterDelay(3000);
+                        return;
+                    }
+
+                    int age = Integer.parseInt(ageText);
+                    double salary = Double.parseDouble(salaryText);
+
                     Employee updatedEmployee = new Employee(selectedEmployee.getId(), name, age, address, salary);
                     try {
                         functionality.editEmployee(updatedEmployee);
-                        outputComboBox.addItem("Employee updated successfully!"); // Add success message to JComboBox (wrong, needs fixing)
+                        outputLabel.setText("Employee edited successfully!");
                         clearFields();
                     } catch (SQLException ex) {
-                        outputComboBox.addItem("Failed to update employee. Error: " + ex.getMessage()); // Add error message to JComboBox
+                        outputLabel.setText("Failed to update employee. Error: " + ex.getMessage());
                     }
                 }
             }
@@ -151,15 +159,30 @@ public class GUI extends JFrame {
                         Employee employee = functionality.getEmployeeByName(selectedEmployeeName);
                         if (employee != null) {
                             selectedEmployee = employee;
-                            setEmployeeFields(employee); // Prepopulate fields with selected employee information
+                            setEmployeeFields(employee); // Populate the fields with the selected employee info
                             displayEmployeeInfo(employee);
                         }
                     } catch (SQLException ex) {
-                        outputLabel.setText("Failed to retrieve employee. Error: " + ex.getMessage());
+                        outputLabel.setText("Failed to retrieve employee. Error: " + ex.getMessage()); // Update outputLabel with the error message
                     }
                 }
             }
         });
+    }
+
+    private boolean isValidNumber(String text) {
+        return text.matches("\\d+");
+    }
+
+    private void clearOutputLabelAfterDelay(int delay) {
+        Timer timer = new Timer(delay, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                outputLabel.setText("");
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
 
     private void displayEmployees(List<Employee> employees) {

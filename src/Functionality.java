@@ -37,9 +37,8 @@ public class Functionality {
             resultSet.close();
             statement.close();
 
-            // Check if ID already exists in the database
             while (isEmployeeIdExists(nextEmployeeId)) {
-                nextEmployeeId++; // Increment ID until unique
+                nextEmployeeId++;
             }
         } catch (SQLException e) {
             System.out.println("Error occurred while retrieving the next employee ID: " + e.getMessage());
@@ -70,7 +69,6 @@ public class Functionality {
         statement.setDouble(4, employee.getSalary());
         statement.executeUpdate();
 
-        // Retrieve ID from database
         ResultSet generatedKeys = statement.getGeneratedKeys();
         if (generatedKeys.next()) {
             int generatedId = generatedKeys.getInt(1);
@@ -121,7 +119,7 @@ public class Functionality {
     }
 
     public List<Employee> searchEmployees(String searchCriteria) throws SQLException {
-        String query = "SELECT * FROM employees WHERE id = ? OR name = ? OR age = ? OR address = ? OR salary = ?";
+        String query = "SELECT * FROM employees WHERE id <> ? AND (name LIKE ? OR age = ? OR address LIKE ? OR salary = ?)";
         PreparedStatement statement = conn.prepareStatement(query);
         try {
             int id = Integer.parseInt(searchCriteria);
@@ -129,14 +127,14 @@ public class Functionality {
         } catch (NumberFormatException e) {
             statement.setInt(1, 0);
         }
-        statement.setString(2, searchCriteria);
+        statement.setString(2, "%" + searchCriteria + "%");
         try {
             int age = Integer.parseInt(searchCriteria);
             statement.setInt(3, age);
         } catch (NumberFormatException e) {
             statement.setInt(3, 0);
         }
-        statement.setString(4, searchCriteria);
+        statement.setString(4, "%" + searchCriteria + "%");
         try {
             double salary = Double.parseDouble(searchCriteria);
             statement.setDouble(5, salary);
