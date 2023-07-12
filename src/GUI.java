@@ -6,25 +6,25 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class GUI extends JFrame {
-    private JTextField nameField;
-    private JTextField ageField;
-    private JTextField addressField;
-    private JTextField salaryField;
-    private JButton searchButton;
-    private JButton addButton;
-    private JButton deleteButton;
-    private JTextField searchField;
-    private JLabel headerIcon;
+    private JPanel accountPanel;
     private JLabel titleText;
+    private JTextField nameField;
     private JLabel nameLabel;
+    private JTextField ageField;
     private JLabel ageLabel;
     private JLabel addressLabel;
+    private JTextField addressField;
     private JLabel salaryLabel;
-    private JPanel accountPanel;
+    private JTextField salaryField;
+    private JButton addButton;
+    private JTextField searchField;
     private JComboBox<String> outputComboBox;
+    private JLabel outputLabel;
+    private JButton searchButton;
     private JButton showAllButton;
     private JButton saveButton;
-    private JLabel outputLabel;
+    private JButton deleteButton;
+    private JLabel headerIcon;
     private Functionality functionality;
     private Employee selectedEmployee; // Store selected employee
 
