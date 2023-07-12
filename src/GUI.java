@@ -129,14 +129,22 @@ public class GUI extends JFrame {
                     String address = addressField.getText();
                     String salaryText = salaryField.getText();
 
-                    if (!isValidNumber(ageText) || !isValidNumber(salaryText)) {
-                        outputLabel.setText("Invalid input type. These fields only accept numeric parameters.");
+                    if (!isValidNumber(ageText)) {
+                        outputLabel.setText("Invalid input type. Age field only accepts numeric parameters.");
                         clearOutputLabelAfterDelay(3000);
                         return;
                     }
 
                     int age = Integer.parseInt(ageText);
-                    double salary = Double.parseDouble(salaryText);
+                    double salary = 0.0;
+
+                    try {
+                        salary = Double.parseDouble(salaryText);
+                    } catch (NumberFormatException ex) {
+                        outputLabel.setText("Invalid input type. Salary field only accepts numeric parameters.");
+                        clearOutputLabelAfterDelay(3000);
+                        return;
+                    }
 
                     Employee updatedEmployee = new Employee(selectedEmployee.getId(), name, age, address, salary);
                     try {
